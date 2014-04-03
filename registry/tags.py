@@ -64,6 +64,12 @@ def get_tags(namespace, repository):
         yield (tag_name, tag_content)
 
 
+def update_tags_file(namespace, repository):
+    tags = get_tags(namespace, repository)
+    data = dict((tag_name, tag_content) for tag_name, tag_content in tags)
+    store.put_content(store.tags_path(namespace, repository), json.dumps(data))
+
+
 @app.route('/v1/repositories/<path:repository>/tags', methods=['GET'])
 @toolkit.parse_repository_name
 @toolkit.requires_auth
@@ -179,6 +185,7 @@ def put_tag(namespace, repository, tag):
     sender = flask.current_app._get_current_object()
     signals.tag_created.send(sender, namespace=namespace,
                              repository=repository, tag=tag, value=data)
+    update_tags_file(namespace, repository)
     # Write some meta-data about the repos
     ua = flask.request.headers.get('user-agent', '')
     data = create_tag_json(user_agent=ua)
@@ -200,6 +207,7 @@ def delete_tag(namespace, repository, tag):
         store.remove(store.repository_json_path(namespace, repository))
     signals.tag_deleted.send(
         sender, namespace=namespace, repository=repository, tag=tag)
+    update_tags_file(namespace, repository)
 
 
 @app.route('/v1/repositories/<path:repository>/tags/<tag>',
