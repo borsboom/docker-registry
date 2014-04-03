@@ -1,3 +1,4 @@
+import os
 import datetime
 import functools
 import logging
@@ -142,6 +143,11 @@ def get_private_image_layer(image_id):
 @set_cache_headers
 @mirroring.source_lookup(cache=True, stream=True)
 def get_image_layer(image_id, headers):
+    cdn_url = os.getenv("REGISTRY_CDN_URL")
+    if cdn_url:
+        image_url = "%s/registry/images/%s/layer" % (cdn_url, image_id)
+        logger.info("get_image_layer: REDIRECT to %s", image_url)
+        return flask.redirect(image_url)
     try:
         bytes_range = None
         if store.supports_bytes_range:
