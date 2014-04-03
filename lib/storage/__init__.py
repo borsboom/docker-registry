@@ -62,6 +62,11 @@ class Storage(object):
             return repository_path
         return '{0}/tag_{1}'.format(repository_path, tagname)
 
+    def tags_path(self, namespace, repository):
+        repository_path = self.repository_path(
+            namespace=namespace, repository=repository)
+        return '{0}/tags'.format(repository_path)
+
     def repository_json_path(self, namespace, repository):
         repository_path = self.repository_path(
             namespace=namespace, repository=repository)
@@ -75,7 +80,7 @@ class Storage(object):
     def index_images_path(self, namespace, repository):
         repository_path = self.repository_path(
             namespace=namespace, repository=repository)
-        return '{0}/_index_images'.format(repository_path)
+        return '{0}/images'.format(repository_path)
 
     def private_flag_path(self, namespace, repository):
         repository_path = self.repository_path(
