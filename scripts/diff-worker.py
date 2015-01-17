@@ -1,20 +1,16 @@
 #!/usr/bin/env python
 
-import argparse
+import argparse  # noqa
+
 import logging
 import os
-import sys
 
 import redis
 
-root_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..'))
-sys.path.append(root_path)
-sys.path.append(os.path.join(root_path, 'lib'))
-
-import layers
-import rlock
-import rqueue
-import storage
+from docker_registry.lib import layers
+from docker_registry.lib import rlock
+from docker_registry.lib import rqueue
+import docker_registry.storage as storage
 
 store = storage.load()
 
@@ -65,6 +61,7 @@ def get_redis_connection(options):
 
 def handle_request(layer_id, redis_conn):
     '''handler for any item pulled from worker job queue
+
     This handler is called every time the worker is able to pop a message
     from the job queue filled by the registry. The worker blocks until a
     message is available. This handler will then attempt to aquire a lock
